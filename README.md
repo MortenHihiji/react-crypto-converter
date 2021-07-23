@@ -1,9 +1,9 @@
-# Crypto Converter
+# React Crypto Converter
 
 ## Installation
 
-- `$ git clone https://github.com/MortenHihiji/crypto-converter.git`
-- `$ cd cyropto-converter
+- `$ git clone https://github.com/MortenHihiji/react-crypto-converter.git`
+- `$ cd react-crypto-converter`
 - `$ yarn` init packages
 
 ## Usage
