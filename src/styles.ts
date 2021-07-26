@@ -23,6 +23,15 @@ const useStyles = makeStyles((theme: Theme) =>
     table: {
       minWidth: 650,
     },
+    redColumn: {
+      backgroundColor: '#d8ffc4',
+    },
+    greenColumn: {
+      backgroundColor: '#ffdada',
+    },
+    rowCurrency: {
+      cursor: 'pointer',
+    },
   }),
 );
 

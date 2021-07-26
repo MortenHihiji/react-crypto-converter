@@ -1,6 +1,5 @@
 import React from 'react';
 import { observer, inject } from 'mobx-react';
-import CurrenciesStore from '../../stores/currenciesStore';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -10,27 +9,42 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-import { TCoin } from '../../types';
+import { TCoin, TCoinDiff } from '../../types';
+import ConverterStore from '../../stores/converterStore';
+import CurrenciesStore from '../../stores/currenciesStore';
 
 type ICryptoTable = {
   classes: any;
   currenciesStore?: CurrenciesStore;
+  converterStore?: ConverterStore;
 };
 
-const CryptoTable = inject('currenciesStore')(
-  observer(({ classes, currenciesStore }: ICryptoTable) => {
+const CryptoTable = inject(
+  'currenciesStore',
+  'converterStore',
+)(
+  observer(({ classes, currenciesStore, converterStore }: ICryptoTable) => {
     const items: TCoin[] = currenciesStore!.getItems;
-    const map = 1;
+    const diffObj: TCoinDiff = currenciesStore!.getDiffObj;
 
     React.useEffect(() => {
       if (currenciesStore) {
         currenciesStore.fetchCoins();
+        setInterval(() => {
+          currenciesStore.fetchCoins();
+        }, 30 * 1000);
       }
     }, []);
 
+    const onClickRow = (coin: TCoin) => {
+      if (converterStore) {
+        converterStore.setSelectedCoin(coin);
+      }
+    };
+
     return (
       <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
+        <Table stickyHeader className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
@@ -43,14 +57,22 @@ const CryptoTable = inject('currenciesStore')(
           <TableBody>
             {!items.length
               ? 'Загрузка...'
-              : items.map((coin) => (
-                  <TableRow key={coin.name}>
+              : items.map((coin: TCoin) => (
+                  <TableRow
+                    onClick={() => onClickRow(coin)}
+                    className={classes.rowCurrency}
+                    key={coin.name}
+                    hover>
                     <TableCell>
                       <img width={18} height={18} src={coin.imageUrl} alt="Coin Icon" />
                     </TableCell>
                     <TableCell align="left">{coin.name}</TableCell>
                     <TableCell align="left">{coin.fullName}</TableCell>
-                    <TableCell align="left">${coin.price}</TableCell>
+                    <TableCell
+                      className={diffObj[coin.name] && classes[`${diffObj[coin.name]}Column`]}
+                      align="left">
+                      ${coin.price}
+                    </TableCell>
                     <TableCell align="left">${coin.volume24Hour}</TableCell>
                   </TableRow>
                 ))}
